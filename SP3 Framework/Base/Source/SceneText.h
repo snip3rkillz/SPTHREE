@@ -102,6 +102,7 @@ public:
 	void RenderMesh(Mesh *mesh, bool enableLight);
 	void Render2DMesh(Mesh *mesh, const bool enableLight, const float size = 1.0f, const float x = 0.0f, const float y = 0.0f, const bool rotate = false);
 	void RenderQuadOnScreen(Mesh* mesh, float sizeX, float sizeY, float x, float y, bool enableLight);
+	void RenderSprites(Mesh* mesh, const float size, const float x, const float y);
 	void RenderInit();
 	void RenderText();
 	void RenderHero();
@@ -151,6 +152,10 @@ private:
 	int level;
 
 	//Sound effects
+
+	//Sprites Variable
+	int increase;
+	int totalSprites;
 };
 
 #endif
