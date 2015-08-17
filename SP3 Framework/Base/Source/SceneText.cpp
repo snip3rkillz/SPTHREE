@@ -182,8 +182,8 @@ void SceneText::Init()
 	meshList[GEO_TILE_SAFEZONE] = MeshBuilder::Generate2DMesh("GEO_TILE_SAFEZONE", Color(1, 1, 1), 0.0f, 0.0f, TILE_SIZE, TILE_SIZE);
 	meshList[GEO_TILE_SAFEZONE]->textureID = LoadTGA("Image//tile11_safezone.tga");
 
-	meshList[GEO_TILEHERO_FRAME0] = MeshBuilder::Generate2DMesh("GEO_TILEHERO_FRAME0", Color(1, 1, 1), 0.0f, 0.0f, TILE_SIZE, TILE_SIZE);
-	meshList[GEO_TILEHERO_FRAME0]->textureID = LoadTGA("Image//Hero//tile2_hero_frame_0.tga");
+	meshList[GEO_TILEHERO_FRAME0] = MeshBuilder::GenerateSprites("GEO_TILEHERO_FRAME0", 3, 3);
+	meshList[GEO_TILEHERO_FRAME0]->textureID = LoadTGA("Image//Hero//hero.tga");
 
 	// ================================= Load Rear Map Tiles =================================
 	
@@ -242,9 +242,13 @@ void SceneText::Init()
 	rotateAngle = 0;
 
 	//Game variables
-	level = 2;
+	level = 1;
 
 	//Sound effects
+
+	// Sprites Animation Variable
+	increase = 0;
+	totalSprites = 2;
 }
 
 void SceneText::Update(double dt)
@@ -294,24 +298,56 @@ void SceneText::Update(double dt)
 	if(Application::IsKeyPressed('A'))
 	{
 		CHAR_HEROKEY = 'a';
+	
+		increase++;
+		if(increase > 5)
+		{
+			increase = 3;
+		}
 	}
 
 	else if(Application::IsKeyPressed('D'))
 	{
 		CHAR_HEROKEY = 'd';
+
+		if(increase < 6)
+		{
+			increase = 6;
+		}
+		increase++;
+		if(increase > 8)
+		{
+			increase = 6;
+		}
 	}
 
-	if(Application::IsKeyPressed('W'))
+	else if(Application::IsKeyPressed('W'))
 	{
 		CHAR_HEROKEY = 'w';
+		
+		increase++;
+		if(increase > totalSprites)
+		{
+			increase = 0;
+		}
 	}
 
-	if(Application::IsKeyPressed('S'))
+	else if(Application::IsKeyPressed('S'))
 	{
 		CHAR_HEROKEY = 's';
+
+		if(increase > totalSprites)
+		{
+			increase = totalSprites;
+		}
+		increase--;
+		if(increase < 0)
+		{
+			increase = totalSprites;
+		}
 	}
 
-	if(Application::IsKeyPressed(VK_SPACE))
+	/*if(Application::IsKeyPressed(VK_SPACE))
 	{
 		BOOL_HEROJUMP = true;
 	}
@@ -319,7 +355,7 @@ void SceneText::Update(double dt)
 	else if(!Application::IsKeyPressed(VK_SPACE))
 	{
 		BOOL_HEROJUMP = false;
-	}
+	}*/
 
 	// =================================== UPDATE THE ENEMY ===================================
 	
@@ -354,6 +390,8 @@ void SceneText::Update(double dt)
 	camera.Update(dt);
 	fps = (float)(1.f / dt);
 	CHAR_HEROKEY = NULL;
+
+	std::cout << increase << std::endl;
 }
 
 void SceneText::UpdateCameraStatus(const unsigned char key, const bool status)
@@ -655,6 +693,43 @@ void SceneText::RenderQuadOnScreen(Mesh* mesh, float sizeX, float sizeY, float x
 	glEnable(GL_DEPTH_TEST);
 }
 
+void SceneText::RenderSprites(Mesh* mesh, const float size, const float x, const float y)
+{
+	glDisable(GL_DEPTH_TEST);
+	Mtx44 ortho;
+	ortho.SetToOrtho(0, 1024, 0, 800, -10, 10);
+	projectionStack.PushMatrix();
+	projectionStack.LoadMatrix(ortho);
+	viewStack.PushMatrix();
+	viewStack.LoadIdentity();
+	modelStack.PushMatrix();
+	modelStack.LoadIdentity();
+	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
+
+	//if (!mesh || mesh->textureID <= 0)
+	//	return;
+
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+
+	Mtx44 characterSpacing;
+	characterSpacing.SetToTranslation(0.5f, 0.5f, 0); //1.0f is the spacing of each character, you may change this value
+	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+
+	mesh->Render((unsigned)increase * 6, 6);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	modelStack.PopMatrix();
+	viewStack.PopMatrix();
+	projectionStack.PopMatrix();
+	glEnable(GL_DEPTH_TEST);
+}
+
 void SceneText::RenderInit()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -701,17 +776,7 @@ void SceneText::RenderText()
 void SceneText::RenderHero()
 {
 	//Walking
-	if(hero.GetAnimationInvert() == false)
-	{
-		if(hero.GetAnimationCounter() == 0)
-			Render2DMesh(meshList[GEO_TILEHERO_FRAME0], false, 1.0f, hero.gettheHeroPositionx(), hero.gettheHeroPositiony(), false);
-	}
-
-	else
-	{
-		if(hero.GetAnimationCounter() == 0)
-			Render2DMesh(meshList[GEO_TILEHERO_FRAME0], false, 1.0f, hero.gettheHeroPositionx(), hero.gettheHeroPositiony(), true);
-	}
+	RenderSprites(meshList[GEO_TILEHERO_FRAME0], 32, hero.gettheHeroPositionx(), hero.gettheHeroPositiony());
 }
 
 void SceneText::RenderEnemies()
@@ -840,7 +905,7 @@ void SceneText::Render()
 		RenderRearTileMap();
 		RenderScrollingMap();
 	}
-	
+
 	RenderEnemies();
 	//RenderGoodies();
 	RenderHero();

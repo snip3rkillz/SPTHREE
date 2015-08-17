@@ -1,17 +1,17 @@
-﻿Build started 17/8/2015 9:39:37 AM.
-     1>Project "C:\Users\Giggs\Desktop\SP3 Framework\Common\Common.vcxproj" on node 2 (build target(s)).
+﻿Build started 17/8/2015 1:57:14 PM.
+     1>Project "C:\Users\Giggs\Documents\GitHub\SPTHREE\SP3 Framework\Common\Common.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\Common.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          All outputs are up-to-date.
        Lib:
          All outputs are up-to-date.
-         Common.vcxproj -> C:\Users\Giggs\Desktop\SP3 Framework\Release\Common.lib
+         Common.vcxproj -> C:\Users\Giggs\Documents\GitHub\SPTHREE\SP3 Framework\Release\Common.lib
        FinalizeBuildStatus:
          Deleting file "Release\Common.unsuccessfulbuild".
          Touching "Release\Common.lastbuildstate".
-     1>Done Building Project "C:\Users\Giggs\Desktop\SP3 Framework\Common\Common.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\Giggs\Documents\GitHub\SPTHREE\SP3 Framework\Common\Common.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.11
+Time Elapsed 00:00:00.04
